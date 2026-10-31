@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            CfstTheme {
                 SpeedTestApp(application)
             }
         }
@@ -67,6 +67,7 @@ fun SpeedTestApp(application: android.app.Application) {
     var showSettings by remember { mutableStateOf(false) }
     var showHistory by remember { mutableStateOf(false) }
     var showExportDialog by remember { mutableStateOf(false) }
+    var showClashExport by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -74,7 +75,7 @@ fun SpeedTestApp(application: android.app.Application) {
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "Cloudflare Speed Test",
+                            text = "CFST · 网络优选",
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
                         )
@@ -94,7 +95,7 @@ fun SpeedTestApp(application: android.app.Application) {
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1976D2),
+                    containerColor = Color(0xFF123D46),
                     titleContentColor = Color.White
                 ),
                 actions = {
@@ -120,7 +121,7 @@ fun SpeedTestApp(application: android.app.Application) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(12.dp)
+                .padding(16.dp)
         ) {
             // 状态卡片
             StatusCard(
@@ -145,6 +146,19 @@ fun SpeedTestApp(application: android.app.Application) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            if (results.isNotEmpty()) {
+                FilledTonalButton(
+                    onClick = { showClashExport = true },
+                    enabled = !isTesting,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Download, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("导出 Clash Meta YAML")
+                }
+                Spacer(Modifier.height(10.dp))
+            }
+
             // 结果工作台 (撑满剩余高度)
             ResultsWorkspace(
                 results = results,
@@ -154,6 +168,10 @@ fun SpeedTestApp(application: android.app.Application) {
                 onCopyClick = { ip -> viewModel.copyIp(ip) }
             )
         }
+    }
+
+    if (showClashExport) {
+        ClashExportDialog(results = results, onDismiss = { showClashExport = false })
     }
 
     // 设置对话框
@@ -190,13 +208,13 @@ fun StatusCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (isTesting) Color(0xFFE3F2FD) else Color(0xFFF5F5F5)
+            containerColor = if (isTesting) Color(0xFFE1F3F0) else Color(0xFFEAF2F5)
         )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
+                .padding(22.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // 进度指示器
@@ -204,8 +222,8 @@ fun StatusCard(
                 val progressValue = if (progress.total > 0) progress.current.toFloat() / progress.total.toFloat() else 0f
                 CircularProgressIndicator(
                     progress = progressValue,
-                    modifier = Modifier.size(56.dp),
-                    color = Color(0xFF1976D2),
+                    modifier = Modifier.size(64.dp),
+                    color = MaterialTheme.colorScheme.primary,
                     strokeWidth = 4.dp
                 )
 
@@ -221,7 +239,7 @@ fun StatusCard(
                     imageVector = Icons.Default.CloudQueue,
                     contentDescription = null,
                     modifier = Modifier.size(56.dp),
-                    tint = Color(0xFF1976D2)
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -247,7 +265,7 @@ fun StatusCard(
                     Text(
                         text = progress.currentIp,
                         fontSize = 12.sp,
-                        color = Color(0xFF1976D2),
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium,
                         fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
                         maxLines = 1,
@@ -277,7 +295,7 @@ fun ControlBar(
             onClick = if (isTesting) onStopClick else onStartClick,
             modifier = Modifier.weight(1.4f),
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (isTesting) Color(0xFFF44336) else Color(0xFF1976D2)
+                containerColor = if (isTesting) Color(0xFFF44336) else MaterialTheme.colorScheme.primary
             )
         ) {
             Icon(
@@ -366,7 +384,7 @@ fun ColumnScope.ResultsWorkspace(
                         Icon(
                             imageVector = Icons.Default.Share,
                             contentDescription = "Export",
-                            tint = if (results.isNotEmpty()) Color(0xFF1976D2) else Color.Gray,
+                            tint = if (results.isNotEmpty()) MaterialTheme.colorScheme.primary else Color.Gray,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -383,7 +401,7 @@ fun ColumnScope.ResultsWorkspace(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "暂无测速结果",
+                        text = "找到更快的连接\n开始测速，探索当前网络的最佳入口",
                         color = Color.Gray,
                         fontSize = 14.sp
                     )
@@ -418,7 +436,7 @@ fun ResultItem(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFAFAFA)
+            containerColor = Color(0xFFF2F7F8)
         ),
         onClick = {
             onCopyClick()
@@ -444,13 +462,13 @@ fun ResultItem(
                         Spacer(modifier = Modifier.width(6.dp))
                         Surface(
                             shape = RoundedCornerShape(4.dp),
-                            color = Color(0xFFE3F2FD)
+                            color = MaterialTheme.colorScheme.primaryContainer
                         ) {
                             Text(
                                 text = result.regionCode,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1976D2),
+                                color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                                 maxLines = 1
                             )
@@ -478,7 +496,7 @@ fun ResultItem(
                 Text(
                     text = "${String.format("%.2f", result.downloadSpeed)} MB/s",
                     fontSize = 12.sp,
-                    color = if (result.downloadSpeed > 0) Color(0xFF1976D2) else Color.Gray
+                    color = if (result.downloadSpeed > 0) MaterialTheme.colorScheme.primary else Color.Gray
                 )
             }
         }
@@ -584,7 +602,7 @@ fun EnhancedSettingsDialog(
                         Text(
                             text = "TCP Ping 探测参数",
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1976D2),
+                            color = MaterialTheme.colorScheme.primary,
                             fontSize = 14.sp
                         )
 
@@ -637,7 +655,7 @@ fun EnhancedSettingsDialog(
                         Text(
                             text = "下载测速策略与阈值",
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1976D2),
+                            color = MaterialTheme.colorScheme.primary,
                             fontSize = 14.sp
                         )
 
@@ -715,7 +733,7 @@ fun EnhancedSettingsDialog(
                         Text(
                             text = "IP 地址池与网络管理",
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1976D2),
+                            color = MaterialTheme.colorScheme.primary,
                             fontSize = 14.sp
                         )
 
@@ -765,7 +783,7 @@ fun EnhancedSettingsDialog(
                                     Text(
                                         text = "已选 ${selectedSpecifiedIpSegments.size} / ${availableIpSegments.size} 个 IP 段",
                                         fontSize = 12.sp,
-                                        color = Color(0xFF1976D2)
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                     Button(
                                         onClick = { showSpecifiedSegmentsDialog = true },
@@ -1012,7 +1030,7 @@ fun SpecifiedSegmentsDialog(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable { onToggleSegment(segment) },
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFFFAFAFA))
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFF2F7F8))
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -1239,7 +1257,7 @@ fun HistoryDialog(
                                                             Text(
                                                                 text = "[${result.regionCode}]",
                                                                 fontSize = 10.sp,
-                                                                color = Color(0xFF1976D2),
+                                                                color = MaterialTheme.colorScheme.primary,
                                                                 fontWeight = FontWeight.Bold
                                                             )
                                                         }
@@ -1253,7 +1271,7 @@ fun HistoryDialog(
                                                         Text(
                                                             text = "${String.format("%.2f", result.downloadSpeed)}MB/s",
                                                             fontSize = 12.sp,
-                                                            color = Color(0xFF1976D2)
+                                                            color = MaterialTheme.colorScheme.primary
                                                         )
                                                     }
                                                 }
@@ -1296,13 +1314,13 @@ fun HistoryDialog(
                                                                         Spacer(modifier = Modifier.width(4.dp))
                                                                         Surface(
                                                                             shape = RoundedCornerShape(3.dp),
-                                                                            color = Color(0xFFE3F2FD)
+                                                                            color = MaterialTheme.colorScheme.primaryContainer
                                                                         ) {
                                                                             Text(
                                                                                 text = result.regionCode,
                                                                                 fontSize = 9.sp,
                                                                                 fontWeight = FontWeight.Bold,
-                                                                                color = Color(0xFF1976D2),
+                                                                                color = MaterialTheme.colorScheme.primary,
                                                                                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
                                                                             )
                                                                         }
@@ -1326,7 +1344,7 @@ fun HistoryDialog(
                                                                 Text(
                                                                     text = "下载: ${String.format("%.2f", result.downloadSpeed)} MB/s",
                                                                     fontSize = 11.sp,
-                                                                    color = Color(0xFF1976D2)
+                                                                    color = MaterialTheme.colorScheme.primary
                                                                 )
                                                             }
                                                         }
@@ -1351,7 +1369,7 @@ fun HistoryDialog(
                                                 Text(
                                                     text = if (isExpanded) "收起 ▴" else "展开全部 (${record.size}项) ▾",
                                                     fontSize = 12.sp,
-                                                    color = Color(0xFF1976D2)
+                                                    color = MaterialTheme.colorScheme.primary
                                                 )
                                             }
                                         }
@@ -1370,3 +1388,4 @@ fun HistoryDialog(
         }
     )
 }
+

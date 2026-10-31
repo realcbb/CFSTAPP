@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.CFST" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:statusBarColor">#1976D2</item>
-        <item name="android:navigationBarColor">#1976D2</item>
-        <item name="android:colorPrimary">#1976D2</item>
-        <item name="android:colorPrimaryDark">#1565C0</item>
-        <item name="android:colorAccent">#FF5722</item>
-        <item name="android:windowBackground">#FAFAFA</item>
+    <style name="Theme.CFST.Base" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:statusBarColor">#123D46</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <!-- Android 7 cannot draw dark navigation icons: keep a dark fallback. -->
+        <item name="android:navigationBarColor">#123D46</item>
+        <item name="colorPrimary">#087F8C</item>
+        <item name="colorPrimaryDark">#123D46</item>
+        <item name="colorAccent">#087F8C</item>
+        <item name="android:colorPrimary">#087F8C</item>
+        <item name="android:colorPrimaryDark">#123D46</item>
+        <item name="android:colorAccent">#087F8C</item>
+        <item name="android:windowBackground">#F2F6F8</item>
     </style>
+    <style name="Theme.CFST" parent="Theme.CFST.Base" />
 </resources>

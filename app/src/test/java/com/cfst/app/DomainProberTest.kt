@@ -30,7 +30,7 @@ class DomainProberTest {
         assertTrue(cfErrorRegex.containsMatchIn(error1001))
         assertTrue(cfErrorRegex.containsMatchIn(error1020))
         assertFalse(cfErrorRegex.containsMatchIn(normalPage))
-
+    }
 
     @Test
     fun testWebSocketFingerprintVerification() {
@@ -54,6 +54,5 @@ class DomainProberTest {
         val code521 = 521
         val isFail521 = code521 == 101 || (code521 == 400 && versionHeader != null)
         assertFalse(isFail521)
-    }
     }
 }

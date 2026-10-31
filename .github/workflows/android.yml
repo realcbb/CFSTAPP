@@ -1,0 +1,40 @@
+name: Android APK
+on:
+  push:
+    branches: [main, feature/clash-yaml-ui]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check fixed signing configuration
+        env:
+          CFST_SIGNING_JSON: ${{ secrets.CFST_SIGNING_JSON }}
+        run: |
+          if [ -z "$CFST_SIGNING_JSON" ]; then
+            echo '::error::Add repository secret CFST_SIGNING_JSON before building. Temporary signed APKs are no longer published.'
+            exit 1
+          fi
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: gradle/actions/setup-gradle@v4
+      - run: bash gradlew testDebugUnitTest assembleRelease --stacktrace
+      - name: Sign APK with fixed private key
+        env:
+          CFST_SIGNING_JSON: ${{ secrets.CFST_SIGNING_JSON }}
+        run: python3 scripts/sign_apk.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CFSTAPP-release
+          path: app/build/outputs/apk/release/CFSTAPP-release.apk
+          if-no-files-found: error
