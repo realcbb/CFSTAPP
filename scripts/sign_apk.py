@@ -34,10 +34,13 @@ def main():
         folder = Path(temp)
         key = folder / 'release.p12'
         pw = folder / 'password.txt'
+        key_pw = folder / 'key-password.txt'
         key.write_bytes(key_bytes)
-        pw.write_text(password, encoding='utf-8')
+        pw.write_text(password + '\n', encoding='utf-8')
+        key_pw.write_text(password + '\n', encoding='utf-8')
         key.chmod(0o600)
         pw.chmod(0o600)
+        key_pw.chmod(0o600)
         # Verify identity before signing. Only a public certificate is printed.
         cert = folder / 'cert.der'
         subprocess.run(['keytool', '-exportcert', '-keystore', str(key), '-storepass:file', str(pw),
@@ -47,7 +50,7 @@ def main():
         if hashlib.sha256(cert.read_bytes()).hexdigest() != EXPECTED_CERT:
             raise SystemExit('Signing certificate does not match the fixed CFSTAPP certificate.')
         subprocess.run([str(signer), 'sign', '--ks', str(key), '--ks-key-alias', alias,
-            '--ks-pass', 'file:' + str(pw), '--key-pass', 'file:' + str(pw),
+            '--ks-pass', 'file:' + str(pw), '--key-pass', 'file:' + str(key_pw),
             '--out', str(output), str(unsigned)], check=True, env=child_env)
         subprocess.run([str(signer), 'verify', '--verbose', '--print-certs', str(output)],
             check=True, env=child_env)
