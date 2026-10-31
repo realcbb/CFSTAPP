@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="648" height="216" viewBox="0 0 324 108">
+<defs><g id="glyph" transform="translate(0,-3)">
+<path fill="#EDF9F6" d="M37 73 C30 73 26 68 26 62 C26 55 31 50 38 49 C40 40 47 35 55 35 C65 35 72 42 73 51 C79 52 82 57 82 63 C82 69 77 73 70 73 Z"/>
+<path fill="none" stroke="#123D46" stroke-width="4" stroke-linecap="round" d="M41 62 A13 13 0 0 1 67 62"/>
+<path fill="none" stroke="#087F8C" stroke-width="4" stroke-linecap="round" d="M54 62 L64 50"/>
+<circle cx="54" cy="62" r="3.5" fill="#123D46"/>
+</g></defs>
+<rect width="324" height="108" fill="#F2F6F8"/>
+<rect x="8" y="8" width="92" height="92" rx="22" fill="#123D46"/><use href="#glyph"/>
+<circle cx="162" cy="54" r="46" fill="#123D46"/><use href="#glyph" transform="translate(108)"/>
+<rect x="224" y="8" width="92" height="92" rx="32" fill="#123D46"/><use href="#glyph" transform="translate(216)"/>
+</svg>
